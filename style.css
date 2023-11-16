@@ -277,3 +277,11 @@ display: none;
 #resultContainer {
 display: none;
 }
+
+#output img {
+  max-width: 100%; /* or any percentage or pixel value that fits your needs */
+  max-height: 600px; /* or any pixel value that fits your needs */
+  height: auto; /* maintain aspect ratio */
+  display: block; /* align block elements correctly */
+  margin: 0 auto; /* center the image if block */
+}

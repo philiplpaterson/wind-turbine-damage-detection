@@ -47,13 +47,20 @@ var infer = function() {
 
 var retrieveDefaultValuesFromLocalStorage = function() {
 	try {
-		var api_key = localStorage.getItem("rf.api_key");
-		var model = localStorage.getItem("rf.model");
+		// var api_key = localStorage.getItem("rf.api_key"); // User-inputed API key
+		// var model = localStorage.getItem("rf.model");
+		// var format = localStorage.getItem("rf.format");
+
+		// Hard-coded values (except for format)
+		var api_key = "IvdnpRmhr55bXdOul1xq"; // HARDCODED API KEY
+		var model = "wind-turbine-wgjo0"; // HARDCODED
 		var format = localStorage.getItem("rf.format");
+		var version = localStorage.getItem("rf.version") || '2'; // Set the default version to '1'
 
 		if (api_key) $('#api_key').val(api_key);
 		if (model) $('#model').val(model);
 		if (format) $('#format').val(format);
+		if (version) $('#version').val(version); // Set the version in the input field
 	} catch (e) {
 		// localStorage disabled
 	}
