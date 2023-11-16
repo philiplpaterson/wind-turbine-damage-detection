@@ -1,5 +1,6 @@
 # wind-turbine-damage-detection
 Program detects cracks and potentially other forms of damages in wind turbine.
+Can be used on: https://philiplpaterson.github.io/wind-turbine-damage-detection/
 
 ## Details:
 - Input footage is from 480p to 720p (most likely 480p)
