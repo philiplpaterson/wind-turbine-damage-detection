@@ -120,6 +120,14 @@ var setupButtonListeners = function() {
 		var filename = parts.pop();
 		$('#fileName').val(filename);
 	});
+
+
+	$(document).ready(function() {
+			$('#runInference').click(function() {
+					$('#droneVideo').show();
+			});
+	});
+
 };
 
 var getSettingsFromForm = function(cb) {
