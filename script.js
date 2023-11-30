@@ -4,6 +4,10 @@ $(function() {
 });
 
 var infer = function() {
+	if(currentInferenceMode !== 'image') {
+		alert('Switch to Image Inference mode first.');
+		return;
+	}
 	$('#output').html("Inferring...");
 	$("#resultContainer").show();
 	$('html').scrollTop(100000);
@@ -120,6 +124,14 @@ var setupButtonListeners = function() {
 		var filename = parts.pop();
 		$('#fileName').val(filename);
 	});
+
+	$('#toggleImageInference').click(function() {
+			toggleInferenceMode('image');
+	});
+
+	$('#toggleVideoInference').click(function() {
+			toggleInferenceMode('video');
+	});
 };
 
 var getSettingsFromForm = function(cb) {
@@ -228,4 +240,72 @@ var resizeImage = function(base64Str) {
 		};
     
 	});	
+};
+
+var currentInferenceMode = 'image'; // Default inference mode
+
+var toggleInferenceMode = function(mode) {
+    currentInferenceMode = mode;
+
+    if(mode === 'image') {
+        // Set file input to accept images
+        $('#file').attr('accept', 'image/*');
+        // Update other elements if necessary
+    } else if(mode === 'video') {
+        // Set file input to accept videos
+        $('#file').attr('accept', 'video/*');
+        // Update other elements if necessary
+    }
+};
+
+
+var performVideoInference = function() {
+	if(currentInferenceMode !== 'video') {
+		alert('Switch to Video Inference mode first.');
+		return;
+	}
+	getSettingsFromForm(function(settings) {
+			var videoInput = $('#fileName').get(0).files[0]; // Assuming there's an input field with id 'videoInput'
+			var videoUrl = $('#url').val(); // Assuming there's an input field with id 'videoUrlInput'
+
+			// Modify settings for video inference
+			var videoInferenceUrl = `https://api.roboflow.com/dataset/${settings.model}/version/${settings.version}/infer-video`;
+			var headers = {
+					'Authorization': `Bearer ${settings.apiKey}` // Using the API key from the form
+			};
+
+			// Initialize FormData for file upload
+			var formData = new FormData();
+			formData.append('file', videoInput);
+
+			// Ajax settings for the video inference request
+			var ajaxSettings = {
+					url: videoInferenceUrl,
+					method: 'POST',
+					headers: headers,
+					contentType: false,
+					processData: false,
+					success: function(response) {
+							// Assuming the API returns a video URL in the response
+							var resultVideoUrl = response.url; // Modify based on the actual response structure
+							$('#videoSource').attr('src', resultVideoUrl);
+							$('#videoResultContainer').show();
+							$('#videoOutput').load(); // Reload the video tag to update the source
+					},
+					error: function(error) {
+							console.error("Error: ", error);
+					}
+			};
+
+			// Decide whether to send video file or video URL
+			if (videoInput) {
+					ajaxSettings.data = formData;
+			} else if (videoUrl) {
+					ajaxSettings.data = JSON.stringify({ url: videoUrl });
+					ajaxSettings.contentType = 'application/json';
+			}
+
+			// Make the API request
+			$.ajax(ajaxSettings);
+	});
 };

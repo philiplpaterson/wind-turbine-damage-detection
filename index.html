@@ -28,6 +28,9 @@
 		</div>
       
 		<div class="content">
+			<button id="toggleImageInference">Image Inference</button>
+			<button id="toggleVideoInference">Video Inference</button>
+
 			<div class="content__grid">
 				<div class="col-12-s6-m4" id="method">
 					<label class="input__label">Upload Method</label>
@@ -101,6 +104,7 @@
 				<div class="col-12">
 					<button type="submit" value="Run Inference" class="bttn__primary">Run Inference</button>
 				</div>
+				<!--<button id="videoInferenceButton">Run Inference on Video</button>--> <!--Video inference addition-->
 			</div>
 			<div class="result" id="resultContainer">
 				<div class="divider"></div>
@@ -109,6 +113,13 @@
 					<a href="#">Copy Code</a>
 				</div>
 				<pre id="output" class="codeblock"/> here is your json </pre>
+			</div>
+			<!-- Container to display the video results -->
+			<div id="videoResultContainer" style="display:none;">
+				<video id="videoOutput" width="320" height="240" controls>
+						<source id="videoSource" type="video/mp4">
+						Your browser does not support the video tag.
+				</video>
 			</div>
 		</div>
 	</form>
