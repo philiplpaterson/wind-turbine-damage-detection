@@ -28,6 +28,12 @@
 		</div>
       
 		<div class="content">
+			<!-- Add this section for toggling between modes -->
+			<div id="modeSelectionContainer">
+				<button id="imageModeButton" class="modeButton active">Image Inference</button>
+				<button id="videoModeButton" class="modeButton">Video Inference</button>
+			</div>
+
 			<div class="content__grid">
 				<div class="col-12-s6-m4" id="method">
 					<label class="input__label">Upload Method</label>
@@ -38,6 +44,7 @@
 				</div>
 
 				<div class="col-12-m8" id="fileSelectionContainer">
+					<input type="file" id="file" accept="image/*, video/*"/>
 					<label class="input__label" for="file">Select File</label>
 					<div class="flex">
 						<input class="input input--left flex-1" type="text" id="fileName" disabled />							

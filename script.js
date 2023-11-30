@@ -120,20 +120,36 @@ var setupButtonListeners = function() {
 		var filename = parts.pop();
 		$('#fileName').val(filename);
 	});
+
+	// Add this inside setupButtonListeners function
+	$('#imageModeButton').click(function() {
+		$('#videoModeButton').removeClass('active');
+		$(this).addClass('active');
+		$('#file').attr('accept', 'image/*');
+	});
+
+	$('#videoModeButton').click(function() {
+		$('#imageModeButton').removeClass('active');
+		$(this).addClass('active');
+		$('#file').attr('accept', 'video/*');
+	});
+
 };
 
 var getSettingsFromForm = function(cb) {
 	var settings = {
-		method: "POST",
+			method: "POST",
 	};
 
-	var parts = [
-		"https://detect.roboflow.com/",
-		$('#model').val(),
-		"/",
-		$('#version').val(),
-		"?api_key=" + $('#api_key').val()
-	];
+	var isVideoMode = $('#videoModeButton').hasClass('active');
+	var baseUrl = "https://detect.roboflow.com/";
+	var model = $('#model').val();
+	var version = $('#version').val();
+	var apiKey = $('#api_key').val();
+
+	var parts = isVideoMode ? 
+			[baseUrl, model, "-video/", version, "?api_key=" + apiKey] : 
+			[baseUrl, model, "/", version, "?api_key=" + apiKey];
 
 	var classes = $('#classes').val();
 	if(classes) parts.push("&classes=" + classes);
@@ -148,44 +164,56 @@ var getSettingsFromForm = function(cb) {
 	parts.push("&format=" + format);
 	settings.format = format;
 
-	if(format == "image") {
-		var labels = $('#labels .active').attr('data-value');
-		if(labels) parts.push("&labels=on");
+	if(format == "image" && !isVideoMode) {
+			var labels = $('#labels .active').attr('data-value');
+			if(labels) parts.push("&labels=on");
 
-		var stroke = $('#stroke .active').attr('data-value');
-		if(stroke) parts.push("&stroke=" + stroke);
+			var stroke = $('#stroke .active').attr('data-value');
+			if(stroke) parts.push("&stroke=" + stroke);
 
-		settings.xhr = function() {
-			var override = new XMLHttpRequest();
-			override.responseType = 'arraybuffer';
-			return override;
-		}
+			settings.xhr = function() {
+					var override = new XMLHttpRequest();
+					override.responseType = 'arraybuffer';
+					return override;
+			}
 	}
 
 	var method = $('#method .active').attr('data-value');
 	if(method == "upload") {
-		var file = $('#file').get(0).files && $('#file').get(0).files.item(0);
-		if(!file) return alert("Please select a file.");
+			var file = $('#file').get(0).files && $('#file').get(0).files.item(0);
+			if(!file) return alert("Please select a file.");
 
-		getBase64fromFile(file).then(function(base64image) {
+			if (!isVideoMode) {
+					getBase64fromFile(file).then(function(base64image) {
+							settings.url = parts.join("");
+							settings.data = base64image;
+
+							console.log(settings);
+							cb(settings);
+					});
+			} else {
+					var formData = new FormData();
+					formData.append('file', file);
+
+					settings.url = parts.join('');
+					settings.data = formData;
+					settings.contentType = false; // Important for video upload
+					settings.processData = false; // Important for video upload
+
+					console.log(settings);
+					cb(settings);
+			}
+	} else {
+			var url = $('#url').val();
+			if(!url) return alert("Please enter a URL");
+
+			parts.push(isVideoMode ? "&video=" : "&image=" + encodeURIComponent(url));
+
 			settings.url = parts.join("");
-			settings.data = base64image;
-
 			console.log(settings);
 			cb(settings);
-		});
-	} else {
-		var url = $('#url').val();
-		if(!url) return alert("Please enter an image URL");
-
-		parts.push("&image=" + encodeURIComponent(url));
-
-		settings.url = parts.join("");
-		console.log(settings);
-		cb(settings);
 	}
 };
-
 var getBase64fromFile = function(file) {
     return new Promise(function(resolve, reject) {
         var reader = new FileReader();
